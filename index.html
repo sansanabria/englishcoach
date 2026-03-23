@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnglishCoach — Aprende inglés</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>EnglishCoach</h1>
+      <p>Aprende inglés — A1 para hispanohablantes</p>
+    </div>
+    <div class="header-actions">
+      <span class="streak-badge" id="streak-badge" title="Racha diaria">🔥 0</span>
+      <button class="save-btn" id="restart-btn" onclick="restartApp()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+        </svg>
+        Reiniciar
+      </button>
+    </div>
+  </div>
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="home" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </button>
+    <button class="tab-btn" data-tab="leerplan" onclick="switchTab('leerplan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Plan de estudio
+    </button>
+    <button class="tab-btn" data-tab="grammatica" onclick="switchTab('grammatica')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+      Gramática
+    </button>
+    <button class="tab-btn" data-tab="oefening" onclick="switchTab('oefening')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Practicar frases
+    </button>
+    <button class="tab-btn" data-tab="werkwoorden" onclick="switchTab('werkwoorden')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
+      Verbos
+    </button>
+    <button class="tab-btn" data-tab="woordenschat" onclick="switchTab('woordenschat')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Vocabulario
+    </button>
+    <button class="tab-btn" data-tab="zinnen" onclick="switchTab('zinnen')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      Todas las frases
+    </button>
+  </nav>
+</header>
+
+<main>
+  <div class="layout-grid">
+    <div>
+
+      <!-- INICIO -->
+      <div id="panel-home" class="panel active">
+
+        <div class="home-hero">
+          <div class="home-hero-left">
+            <div class="home-hero-title">¡Bienvenido a EnglishCoach!</div>
+            <div class="home-hero-sub">Aprende inglés desde cero · A1</div>
+          </div>
+          <div class="home-stats">
+            <div class="home-stat">
+              <span class="home-stat-num" id="home-streak">0</span>
+              <span class="home-stat-label">🔥 Racha</span>
+            </div>
+            <div class="home-stat-divider"></div>
+            <div class="home-stat">
+              <span class="home-stat-num" id="home-sentences">0</span>
+              <span class="home-stat-label">Frases</span>
+            </div>
+            <div class="home-stat-divider"></div>
+            <div class="home-stat">
+              <span class="home-stat-num" id="home-due">0</span>
+              <span class="home-stat-label">A repasar</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="home-continue-bar"></div>
+
+
+      </div>
+
+      <!-- PRACTICAR FRASES -->
+      <div id="panel-oefening" class="panel">
+        <div id="unit-bar-oefening"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Practicar frases</span>
+            <span id="ex-badge" class="badge badge-a1">A1</span>
+          </div>
+          <div class="ex-mode-row">
+            <button class="ex-mode-btn active" data-mode="all" onclick="setExMode('all')">Todas las frases</button>
+            <button class="ex-mode-btn" data-mode="errors" onclick="setExMode('errors')">Solo errores</button>
+            <button class="ex-mode-btn" data-mode="spaced" onclick="setExMode('spaced')">🔁 Repaso <span id="due-badge" class="due-badge" style="display:none">0</span></button>
+            <span class="ex-mode-count" id="ex-mode-count"></span>
+          </div>
+          <div class="ex-filter-bar">
+            <div class="filter-row" id="ex-level-filter" style="display:none">
+              <span class="ex-filter-label">Nivel</span>
+              <button class="filter-btn active" data-exlevel="all" data-level="all" onclick="filterExLevel('all',this)">Todos</button>
+              <button class="filter-btn a1-btn" data-exlevel="A1" data-level="A1" onclick="filterExLevel('A1',this)">A1</button>
+              <button class="filter-btn a2-btn" data-exlevel="A2" data-level="A2" onclick="filterExLevel('A2',this)">A2</button>
+            </div>
+            <div class="filter-row" id="ex-grammar-filter">
+              <span class="ex-filter-label">Gramática</span>
+              <button class="filter-btn active" data-exgrammar="all"          data-grammar="all"          onclick="filterExGrammar('all',this)">Todas</button>
+              <button class="filter-btn"        data-exgrammar="negation"     data-grammar="negation"     onclick="filterExGrammar('negation',this)">Negación</button>
+              <button class="filter-btn"        data-exgrammar="question"     data-grammar="question"     onclick="filterExGrammar('question',this)">Preguntas</button>
+              <button class="filter-btn"        data-exgrammar="tenses"       data-grammar="tenses"       onclick="filterExGrammar('tenses',this)">Tiempos</button>
+              <button class="filter-btn"        data-exgrammar="there-is"     data-grammar="there-is"     onclick="filterExGrammar('there-is',this)">There is/are</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="exercise-progress">
+              <span class="progress-label" id="ex-counter">1 / 8</span>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="ex-progress" style="width:12.5%"></div>
+              </div>
+              <span class="progress-label" id="ex-score-label">0 bien</span>
+            </div>
+            <div class="ex-accountability" id="ex-accountability">
+              <span id="ex-acc-practiced">0 practicadas</span>
+              <span class="ex-acc-dot">·</span>
+              <span id="ex-acc-remaining">0 restantes</span>
+              <span class="ex-acc-dot">·</span>
+              <span id="ex-acc-errors">0 errores</span>
+              <button class="ex-acc-restart" onclick="restartExercise()" title="Empezar de nuevo">↺ Reiniciar</button>
+            </div>
+
+            <div class="exercise-card">
+              <button class="ex-star-btn" id="ex-star-btn" onclick="toggleStarSentence()" title="Marcar como pregunta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+              <div class="exercise-direction" id="ex-direction">Traduce al inglés</div>
+              <div class="exercise-prompt" id="ex-prompt">I go to school.</div>
+              <div class="ex-stype-row" id="ex-stype-row" style="display:none">
+                <span class="stype-badge" id="ex-stype-badge"></span>
+                <span class="ex-stype-en" id="ex-stype-en"></span>
+              </div>
+            </div>
+
+            <div class="ex-comment-wrap" id="ex-comment-wrap" style="display:none">
+              <div class="ex-comment-label">📝 Mi pregunta / comentario</div>
+              <textarea class="ex-comment-input" id="ex-comment-input" placeholder="Escribe aquí tu pregunta o comentario..." rows="2"></textarea>
+              <div class="ex-comment-actions">
+                <button class="btn btn-primary ex-comment-save" onclick="saveStarComment()">Guardar</button>
+                <button class="btn btn-secondary" onclick="deleteStarComment()">Eliminar comentario</button>
+              </div>
+            </div>
+
+            <div class="ex-hint-wrap">
+              <button class="ex-hint-btn" onclick="toggleExHint(this)">
+                <span>💡 Pista de gramática</span>
+                <span class="ex-hint-arrow">▾</span>
+              </button>
+              <div class="ex-hint-body" id="ex-hint-body"></div>
+            </div>
+
+            <div id="letter-hint-wrap" class="letter-hint-wrap" style="display:none">
+              <button class="btn-letter-hint" onclick="showLetterHint()">Pista de letras (haz clic para más)</button>
+              <div class="letter-hint-text" id="letter-hint-text"></div>
+            </div>
+
+            <div class="input-mode-row">
+              <button class="ex-mode-btn active" data-imode="type"      onclick="setInputMode('type')">✏ Escribir</button>
+              <button class="ex-mode-btn"        data-imode="tiles"     onclick="setInputMode('tiles')">☰ Elegir palabras</button>
+              <button class="ex-mode-btn"        data-imode="fillblank" onclick="setInputMode('fillblank')">✂ Completar</button>
+              <button class="ex-mode-btn"        data-imode="translate" onclick="setInputMode('translate')">🔄 EN → ES</button>
+            </div>
+
+            <div id="type-section">
+              <div class="input-row">
+                <input class="exercise-input" type="text" id="ex-input" placeholder="Escribe tu respuesta aquí..." autocomplete="off" />
+                <button class="btn btn-primary" id="ex-check-btn" onclick="checkAnswer()">Comprobar</button>
+              </div>
+            </div>
+
+            <div id="tile-section" style="display:none">
+              <div class="tile-built" id="tile-built"></div>
+              <div class="tile-pool"  id="tile-pool"></div>
+              <div style="text-align:center;margin-top:10px">
+                <button class="btn btn-primary" id="ex-check-btn-tiles" onclick="checkAnswer()">Comprobar</button>
+              </div>
+            </div>
+
+            <div id="fillblank-section" style="display:none">
+              <div class="fillblank-sentence" id="fillblank-sentence"></div>
+              <div class="input-row">
+                <input class="exercise-input" type="text" id="fillblank-input" placeholder="Escribe la palabra que falta..." autocomplete="off" />
+                <button class="btn btn-primary" id="ex-check-btn-fillblank" onclick="checkAnswer()">Comprobar</button>
+              </div>
+            </div>
+
+            <div class="feedback-box" id="ex-feedback"></div>
+
+            <div class="congrats-panel" id="ex-congrats">
+              <div class="congrats-emoji">🎉</div>
+              <div class="congrats-title">¡Bien hecho!</div>
+              <div class="congrats-sub" id="ex-congrats-sub"></div>
+              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+                <button class="btn btn-primary" id="ex-congrats-next-btn" onclick="_goNextUnitStep('oefening')" style="display:none">Siguiente paso →</button>
+                <button class="btn btn-secondary" onclick="restartExercise()">Practicar de nuevo</button>
+              </div>
+            </div>
+
+            <div class="btn-row" id="ex-btn-row">
+              <button class="btn btn-secondary" onclick="skipSentence()">Saltar</button>
+              <button class="btn btn-primary" id="ex-next-btn" style="display:none" onclick="nextSentence()">Siguiente →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TODAS LAS FRASES -->
+      <div id="panel-zinnen" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Todas las frases</span>
+            <span class="badge badge-a1" style="opacity:0.6" id="sentence-count-badge">8 frases</span>
+          </div>
+          <div class="card-body">
+            <div class="filter-row">
+              <button class="filter-btn active" onclick="filterSentences('all', this)">Todos los niveles</button>
+              <button class="filter-btn" onclick="filterSentences('A1', this)">A1</button>
+              <button class="filter-btn" onclick="filterSentences('A2', this)">A2</button>
+              <button class="filter-btn filter-btn--star" onclick="filterSentences('flagged', this)" id="zinnen-flagged-btn">⭐ Preguntas</button>
+            </div>
+            <table class="sentence-table">
+              <thead>
+                <tr>
+                  <th style="width:28px"></th>
+                  <th>Español</th>
+                  <th>Inglés</th>
+                  <th>Nivel</th>
+                  <th>Tipo</th>
+                </tr>
+              </thead>
+              <tbody id="sentence-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VERBOS -->
+      <div id="panel-werkwoorden" class="panel">
+        <div id="unit-bar-werkwoorden"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Selecciona un verbo</span>
+            <span class="verb-total-badge" id="verb-total-badge"></span>
+          </div>
+          <div class="card-body">
+            <div class="verb-selector" id="verb-selector"></div>
+          </div>
+        </div>
+        <div id="verb-choice-card" style="display:none; margin-top:16px">
+          <div class="verb-choice-row">
+            <button class="verb-choice-btn" onclick="showVerbStudy()">
+              <span class="vcb-icon">📖</span>
+              <span class="vcb-label">Explicación y conjugación</span>
+              <span class="vcb-sub">Explicación y conjugación de verbos</span>
+            </button>
+            <button class="verb-choice-btn" onclick="showVerbExercise()">
+              <span class="vcb-icon">✏️</span>
+              <span class="vcb-label">Practicar</span>
+              <span class="vcb-sub">Practicar todos los tiempos</span>
+            </button>
+          </div>
+        </div>
+        <div class="card" id="verb-study-card" style="display:none; margin-top:16px">
+          <div class="card-header">
+            <span class="card-title" id="verb-study-title"></span>
+            <span class="verb-meaning" id="verb-study-meaning"></span>
+          </div>
+          <div class="card-body">
+            <div id="conjtool-table"></div>
+            <details class="tense-ref-details">
+              <summary class="tense-ref-summary">¿Cuándo usar cada tiempo?</summary>
+              <div id="tense-quick-ref"></div>
+            </details>
+          </div>
+        </div>
+        <div class="card" id="verb-ex-card" style="display:none; margin-top:16px">
+          <div class="card-header">
+            <span class="card-title">Practicar — todos los tiempos</span>
+            <div class="verb-ex-score">
+              <span class="stat-correct" id="vex-correct">✓ 0</span>
+              <span class="stat-wrong"   id="vex-wrong">✗ 0</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="verb-ex-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VOCABULARIO -->
+      <div id="panel-woordenschat" class="panel">
+        <div id="unit-bar-woordenschat"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Vocabulario</span>
+            <span class="badge badge-a1" id="vocab-count-badge">0 palabras</span>
+            <button class="btn btn-primary" id="vocab-practice-btn" onclick="startVocabPractice()" style="display:none; padding:6px 14px; font-size:0.85rem">▶ Practicar</button>
+          </div>
+          <div class="card-body">
+            <div id="vocab-practice-area" style="display:none"></div>
+            <div id="vocab-grid-area">
+              <div class="vocab-controls">
+                <input class="vocab-search" type="text" id="vocab-search" placeholder="Buscar una palabra..." oninput="filterVocab()" autocomplete="off" />
+                <div class="vocab-filters" id="vocab-level-filters" style="display:none">
+                  <button class="filter-btn active" data-level="all" onclick="setVocabLevel('all', this)">Todos</button>
+                  <button class="filter-btn"         data-level="A1"  onclick="setVocabLevel('A1',  this)">A1</button>
+                  <button class="filter-btn"         data-level="A2"  onclick="setVocabLevel('A2',  this)">A2</button>
+                </div>
+                <div class="vocab-filters" id="vocab-topic-filters"></div>
+                <label class="vocab-hide-toggle">
+                  <input type="checkbox" id="vocab-hide-cb" onchange="filterVocab()" />
+                  Ocultar traducciones (autotest)
+                </label>
+              </div>
+              <div class="vocab-grid" id="vocab-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRAMÁTICA -->
+      <div id="panel-grammatica" class="panel">
+        <div id="unit-bar-grammatica"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Gramática</span>
+            <span class="badge badge-a1">A1 – A2</span>
+          </div>
+          <div class="card-body">
+            <p class="grammar-intro">Selecciona tu nivel para ver el contenido de gramática correspondiente.</p>
+            <div class="filter-row" id="gt-level-filter">
+              <button class="filter-btn active" data-gtlevel="all" onclick="filterGrammarLevel('all',this)">Todo</button>
+              <button class="filter-btn a1-btn"  data-gtlevel="A1" onclick="filterGrammarLevel('A1',this)">A1</button>
+              <button class="filter-btn a2-btn"  data-gtlevel="A2" onclick="filterGrammarLevel('A2',this)">A2</button>
+            </div>
+            <div class="filter-row" id="gt-subtopic-filter" style="display:none; margin-top:6px;"></div>
+            <div id="grammar-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAN DE ESTUDIO -->
+      <div id="panel-leerplan" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Plan de estudio — Inglés A1</span>
+          </div>
+          <div class="card-body">
+            <div id="leerplan-content"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div>
+</main>
+
+<footer>
+  ¡Mucho éxito con tu inglés! 🇬🇧🇺🇸
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/grammar-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
