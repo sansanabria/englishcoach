@@ -2443,8 +2443,11 @@ function loadVerbExercise() {
 
   // Simplified rows: in English verbs only change for he/she/it in present simple
   const exRows = [
-    { label: 'I / you / we / they', labelEs: 'yo / tú / nosotros / ellos', fi: 0, pi: 0 },
-    { label: 'he / she / it',       labelEs: 'él / ella',                   fi: 2, pi: 1 },
+    { label: 'I',             labelEs: 'yo',             fi: 0 },
+    { label: 'you',           labelEs: 'tú / usted',     fi: 1 },
+    { label: 'he / she / it', labelEs: 'él / ella',      fi: 2 },
+    { label: 'we',            labelEs: 'nosotros/as',    fi: 3 },
+    { label: 'they',          labelEs: 'ellos / ellas',  fi: 5 },
   ];
 
   const tableRows = exRows.map((row, pi) => {
