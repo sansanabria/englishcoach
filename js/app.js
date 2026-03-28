@@ -17,7 +17,7 @@ function switchTab(id) {
   if (id === 'oefening')     { loadSentence(); renderUnitBar('oefening'); }
   if (id === 'bewerken')     { renderEditTable(); renderFlagsSection(); }
   if (id === 'woordenschat') { renderVocab(); renderUnitBar('woordenschat'); }
-  if (id === 'werkwoorden')  renderUnitBar('werkwoorden');
+  if (id === 'werkwoorden')  { renderUnitBar('werkwoorden'); if (_previewUnit) _filterVerbsByUnit(_previewUnit); }
   if (id === 'dehet')        renderUnitBar('dehet');
   if (id === 'grammatica')   { renderGrammarContent(); renderUnitBar('grammatica'); }
   if (id === 'leerplan')     renderLessonPlan();
@@ -3315,6 +3315,34 @@ function clearActiveUnit() {
   renderVocab();
 }
 
+function _filterVerbsByUnit(u) {
+  if (u && u.verbFocus && u.verbFocus.length > 0) {
+    const focusSet = new Set(u.verbFocus);
+    document.querySelectorAll('.verb-chip').forEach(chip => {
+      const inf = chip.querySelector('.verb-chip-inf');
+      if (inf) chip.style.display = focusSet.has(inf.textContent.trim()) ? '' : 'none';
+    });
+    document.querySelectorAll('.verb-group-header').forEach(h => h.style.display = 'none');
+    // Update verb count
+    const badge = document.getElementById('verb-total-badge');
+    if (badge) badge.textContent = u.verbFocus.length + ' verbos';
+  }
+}
+
+function _showAllVerbs() {
+  document.querySelectorAll('.verb-chip').forEach(chip => chip.style.display = '');
+  document.querySelectorAll('.verb-group-header').forEach(h => h.style.display = '');
+  const searchInput = document.getElementById('verb-search');
+  const typeFilters = document.getElementById('verb-type-filters');
+  if (searchInput) searchInput.style.display = '';
+  if (typeFilters) typeFilters.style.display = '';
+  // Restore verb count
+  if (typeof verbs !== 'undefined') {
+    const badge = document.getElementById('verb-total-badge');
+    if (badge) badge.textContent = verbs.length + ' verbos';
+  }
+}
+
 function setPreviewUnit(unitNumber) {
   if (!unitNumber || unitNumber === 'all') {
     clearPreviewUnit();
@@ -3336,6 +3364,8 @@ function setPreviewUnit(unitNumber) {
       vocabUnitLevel = null;
     }
     renderVocab();
+    // Filter verbs by unit's verbFocus
+    _filterVerbsByUnit(u);
   }
   renderAllUnitBars();
   // Reload current panel content
@@ -3344,6 +3374,7 @@ function setPreviewUnit(unitNumber) {
     if (activePanel.id === 'panel-oefening') loadSentence();
     if (activePanel.id === 'panel-woordenschat') renderVocab();
     if (activePanel.id === 'panel-grammatica') renderGrammarContent();
+    if (activePanel.id === 'panel-werkwoorden') _filterVerbsByUnit(_previewUnit);
   }
 }
 
@@ -3353,6 +3384,7 @@ function clearPreviewUnit() {
   vocabUnitLevel = null;
   rebuildActive();
   exIdx = 0;
+  _showAllVerbs();
   renderAllUnitBars();
   renderVocab();
   const activePanel = document.querySelector('.panel.active');
