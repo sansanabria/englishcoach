@@ -222,9 +222,9 @@ function renderVocab() {
 
   document.getElementById('vocab-count-badge').textContent = list.length + ' palabras';
 
-  // Show practice button only when a unit is active
+  // Show practice button whenever there are words to practice
   const practiceBtn = document.getElementById('vocab-practice-btn');
-  if (practiceBtn) practiceBtn.style.display = (vocabUnitTopics && list.length > 0) ? '' : 'none';
+  if (practiceBtn) practiceBtn.style.display = (list.length > 0) ? '' : 'none';
 
   document.getElementById('vocab-grid').innerHTML = list.map(w => `
     <div class="vocab-card" onclick="this.classList.toggle('revealed')">
