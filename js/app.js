@@ -3876,6 +3876,7 @@ let _vpList = [];
 let _vpIdx = 0;
 let _vpCorrect = 0;
 let _vpWrong = 0;
+let _vpMode = 'mc'; // 'mc' = multiple choice, 'flip' = flashcard (reveal)
 
 function startVocabPractice() {
   _vpList = _getVocabList().sort(() => Math.random() - 0.5);
@@ -3888,33 +3889,126 @@ function startVocabPractice() {
   _renderVpCard();
 }
 
+function _vpSetMode(mode) {
+  _vpMode = mode;
+  _renderVpCard();
+}
+
+function _vpGetDistractors(correctWord, count) {
+  // Get wrong answers from the full vocabulary pool
+  const pool = vocabulary.filter(w => w.en !== correctWord.en && w.nl !== correctWord.nl);
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count).map(w => w.en);
+}
+
 function _renderVpCard() {
   const area = document.getElementById('vocab-practice-area');
   const total = _vpList.length;
   if (_vpIdx >= total) { _renderVpResult(); return; }
   const w = _vpList[_vpIdx];
-  area.innerHTML = `
-    <div style="text-align:center; padding: 8px 0 16px">
-      <span style="font-size:0.85rem; color:var(--text-muted)">${_vpIdx + 1} / ${total}</span>
+
+  const modeToggle = `
+    <div style="display:flex; justify-content:center; margin-bottom:16px">
+      <div style="display:flex; border:2px solid var(--primary); border-radius:var(--radius-sm); overflow:hidden">
+        <button onclick="_vpSetMode('mc')" style="padding:6px 18px; font-size:0.78rem; font-weight:800; font-family:'Nunito',sans-serif; border:none; cursor:pointer;
+          background:${_vpMode === 'mc' ? 'var(--primary)' : 'transparent'}; color:${_vpMode === 'mc' ? '#fff' : 'var(--primary)'}">Opciones</button>
+        <button onclick="_vpSetMode('flip')" style="padding:6px 18px; font-size:0.78rem; font-weight:800; font-family:'Nunito',sans-serif; border:none; cursor:pointer;
+          background:${_vpMode === 'flip' ? 'var(--primary)' : 'transparent'}; color:${_vpMode === 'flip' ? '#fff' : 'var(--primary)'}">Tarjeta</button>
+      </div>
+    </div>`;
+
+  const progressBar = `
+    <div style="text-align:center; padding: 8px 0 12px">
+      <span style="font-size:0.85rem; color:var(--text-muted); font-weight:700">${_vpIdx + 1} / ${total}</span>
       <div style="background:var(--border); height:6px; border-radius:4px; margin:8px 0">
         <div style="background:var(--primary); height:6px; border-radius:4px; width:${Math.round((_vpIdx/total)*100)}%"></div>
       </div>
-    </div>
+    </div>`;
+
+  const wordCard = `
     <div style="background:var(--surface); border:2px solid var(--border); border-radius:12px; padding:32px 24px; text-align:center; margin-bottom:16px">
       <div style="font-size:1.6rem; font-weight:800; margin-bottom:8px">${w.nl}</div>
       <div style="font-size:0.85rem; color:var(--text-muted)">${w.type} · ${topicLabels[w.topic] || w.topic}</div>
       <div id="vp-translation" style="display:none; font-size:1.1rem; color:var(--primary); margin-top:16px; font-style:italic">${w.en}</div>
-    </div>
-    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
-      <button id="vp-reveal-btn" class="btn btn-secondary" onclick="revealVocabWord()" style="min-width:140px">Mostrar traducción</button>
-      <div id="vp-grade-btns" style="display:none; gap:12px; flex-wrap:wrap; justify-content:center">
-        <button class="btn btn-primary" onclick="gradeVocabWord(true)" style="min-width:120px">✓ Lo sé</button>
-        <button class="btn" onclick="gradeVocabWord(false)" style="background:var(--error);color:#fff;min-width:120px;box-shadow:0 4px 0 #c43a3a">✗ No lo sé</button>
-      </div>
-    </div>
-    <div style="text-align:center; margin-top:16px">
-      <button class="btn btn-secondary" onclick="stopVocabPractice()" style="font-size:0.8rem">Parar</button>
     </div>`;
+
+  if (_vpMode === 'mc') {
+    // Multiple choice mode
+    const distractors = _vpGetDistractors(w, 3);
+    const options = [w.en, ...distractors].sort(() => Math.random() - 0.5);
+
+    const optionsHtml = options.map(opt => {
+      const escaped = opt.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      return `<button class="vp-mc-btn" onclick="vpCheckMcAnswer('${escaped}')"
+        style="display:block; width:100%; text-align:left; padding:14px 18px; margin-bottom:8px;
+        background:var(--surface); border:2px solid var(--border); border-radius:var(--radius-sm);
+        font-family:'Nunito',sans-serif; font-size:0.95rem; font-weight:700; color:var(--text);
+        cursor:pointer; transition:all 0.15s; box-shadow:0 3px 0 rgba(26,26,46,0.08)"
+        onmouseover="this.style.borderColor='var(--primary)'"
+        onmouseout="this.style.borderColor='var(--border)'">${opt}</button>`;
+    }).join('');
+
+    area.innerHTML = `${progressBar}${modeToggle}${wordCard}
+      <div style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px">Elige la traducción correcta:</div>
+      <div id="vp-mc-options">${optionsHtml}</div>
+      <div id="vp-mc-feedback" style="display:none; text-align:center; margin-top:12px"></div>
+      <div style="text-align:center; margin-top:16px">
+        <button class="btn btn-secondary" onclick="stopVocabPractice()" style="font-size:0.8rem">Parar</button>
+      </div>`;
+  } else {
+    // Flashcard mode (original reveal behavior)
+    area.innerHTML = `${progressBar}${modeToggle}${wordCard}
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
+        <button id="vp-reveal-btn" class="btn btn-secondary" onclick="revealVocabWord()" style="min-width:140px">Mostrar traducción</button>
+        <div id="vp-grade-btns" style="display:none; gap:12px; flex-wrap:wrap; justify-content:center">
+          <button class="btn btn-primary" onclick="gradeVocabWord(true)" style="min-width:120px">✓ Lo sé</button>
+          <button class="btn" onclick="gradeVocabWord(false)" style="background:var(--error);color:#fff;min-width:120px;box-shadow:0 4px 0 #c43a3a">✗ No lo sé</button>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:16px">
+        <button class="btn btn-secondary" onclick="stopVocabPractice()" style="font-size:0.8rem">Parar</button>
+      </div>`;
+  }
+}
+
+function vpCheckMcAnswer(selected) {
+  const w = _vpList[_vpIdx];
+  const correct = selected === w.en;
+  const btns = document.querySelectorAll('.vp-mc-btn');
+  btns.forEach(btn => {
+    btn.disabled = true;
+    btn.style.cursor = 'default';
+    btn.onmouseover = null;
+    btn.onmouseout = null;
+    if (btn.textContent === w.en) {
+      btn.style.background = 'var(--success-bg)';
+      btn.style.borderColor = 'var(--success)';
+      btn.style.color = 'var(--success)';
+    } else if (btn.textContent === selected && !correct) {
+      btn.style.background = 'var(--error-bg)';
+      btn.style.borderColor = 'var(--error)';
+      btn.style.color = 'var(--error)';
+      btn.style.animation = 'shake 0.4s ease';
+    }
+  });
+
+  const fb = document.getElementById('vp-mc-feedback');
+  if (fb) {
+    fb.style.display = '';
+    if (correct) {
+      fb.innerHTML = `<span style="font-weight:800; color:var(--success); font-size:1rem">✓ ¡Correcto!</span>`;
+      if (typeof burstConfetti === 'function') burstConfetti();
+    } else {
+      fb.innerHTML = `<span style="font-weight:800; color:var(--error); font-size:1rem">✗ La respuesta correcta es: <em>${w.en}</em></span>`;
+    }
+  }
+
+  if (correct) _vpCorrect++; else _vpWrong++;
+
+  setTimeout(() => {
+    _vpIdx++;
+    _renderVpCard();
+  }, correct ? 1000 : 2000);
 }
 
 function revealVocabWord() {
