@@ -61,8 +61,8 @@ function renderHome() {
       const isCurrent = i === activeActivityIdx;
       const stepLabel = _getActivityLabel(u.unit, i);
       return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;
-        background:${isCurrent ? 'var(--primary)' : isDone ? '#dcfce7' : '#f3f4f6'};
-        color:${isCurrent ? '#fff' : isDone ? '#15803d' : 'var(--text-muted)'};
+        background:${isCurrent ? 'var(--primary)' : isDone ? 'var(--success-bg)' : 'var(--surface2)'};
+        color:${isCurrent ? '#fff' : isDone ? 'var(--success)' : 'var(--text-muted)'};
         cursor:pointer" onclick="_navigateToActivity(${i})">
         <span style="font-weight:700;font-size:0.85rem">${isDone ? '✓' : ''} ${stepLabel}</span>
         <span style="font-size:0.85rem">${a.desc}</span>
@@ -71,7 +71,7 @@ function renderHome() {
 
     if (continueBar) {
       continueBar.innerHTML = `
-        <div style="background:var(--card-bg,#fff);border:1px solid var(--border,#e5e7eb);border-radius:16px;padding:24px;margin-bottom:16px">
+        <div style="background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
             <span class="unit-bar-chip unit-bar-chip--${u.level.toLowerCase()}" style="font-size:0.9rem;padding:4px 14px">Unidad ${u.unit} · ${u.level}</span>
             <span style="font-size:1.1rem;font-weight:700">${u.title}</span>
@@ -3896,20 +3896,20 @@ function _renderVpCard() {
   area.innerHTML = `
     <div style="text-align:center; padding: 8px 0 16px">
       <span style="font-size:0.85rem; color:var(--text-muted)">${_vpIdx + 1} / ${total}</span>
-      <div style="background:var(--bg-progress,#e5e7eb); height:4px; border-radius:4px; margin:8px 0">
-        <div style="background:var(--color-primary,#276047); height:4px; border-radius:4px; width:${Math.round((_vpIdx/total)*100)}%"></div>
+      <div style="background:var(--border); height:6px; border-radius:4px; margin:8px 0">
+        <div style="background:var(--primary); height:6px; border-radius:4px; width:${Math.round((_vpIdx/total)*100)}%"></div>
       </div>
     </div>
-    <div style="background:var(--card-bg,#fff); border:1px solid var(--border,#e5e7eb); border-radius:12px; padding:32px 24px; text-align:center; margin-bottom:16px">
-      <div style="font-size:1.6rem; font-weight:700; margin-bottom:8px">${w.nl}</div>
+    <div style="background:var(--surface); border:2px solid var(--border); border-radius:12px; padding:32px 24px; text-align:center; margin-bottom:16px">
+      <div style="font-size:1.6rem; font-weight:800; margin-bottom:8px">${w.nl}</div>
       <div style="font-size:0.85rem; color:var(--text-muted)">${w.type} · ${topicLabels[w.topic] || w.topic}</div>
-      <div id="vp-translation" style="display:none; font-size:1.1rem; color:var(--color-primary,#276047); margin-top:16px; font-style:italic">${w.en}</div>
+      <div id="vp-translation" style="display:none; font-size:1.1rem; color:var(--primary); margin-top:16px; font-style:italic">${w.en}</div>
     </div>
     <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
       <button id="vp-reveal-btn" class="btn btn-secondary" onclick="revealVocabWord()" style="min-width:140px">Mostrar traducción</button>
       <div id="vp-grade-btns" style="display:none; gap:12px; flex-wrap:wrap; justify-content:center">
-        <button class="btn" onclick="gradeVocabWord(true)" style="background:#16a34a;color:#fff;min-width:120px">✓ Lo sé</button>
-        <button class="btn" onclick="gradeVocabWord(false)" style="background:#dc2626;color:#fff;min-width:120px">✗ No lo sé</button>
+        <button class="btn btn-primary" onclick="gradeVocabWord(true)" style="min-width:120px">✓ Lo sé</button>
+        <button class="btn" onclick="gradeVocabWord(false)" style="background:var(--error);color:#fff;min-width:120px;box-shadow:0 4px 0 #c43a3a">✗ No lo sé</button>
       </div>
     </div>
     <div style="text-align:center; margin-top:16px">
@@ -3943,11 +3943,11 @@ function _renderVpResult() {
       <div style="font-size:1.4rem; font-weight:700; margin-bottom:20px">¡Ejercicio completado!</div>
       <div style="display:flex; gap:32px; justify-content:center; margin-bottom:8px; flex-wrap:wrap">
         <div style="text-align:center">
-          <div style="font-size:2.2rem; font-weight:700; color:#16a34a">${_vpCorrect}</div>
+          <div style="font-size:2.2rem; font-weight:900; color:var(--success)">${_vpCorrect}</div>
           <div style="font-size:0.85rem; color:var(--text-muted)">✓ correcto</div>
         </div>
         <div style="text-align:center">
-          <div style="font-size:2.2rem; font-weight:700; color:#dc2626">${_vpWrong}</div>
+          <div style="font-size:2.2rem; font-weight:900; color:var(--error)">${_vpWrong}</div>
           <div style="font-size:0.85rem; color:var(--text-muted)">✗ incorrecto</div>
         </div>
         <div style="text-align:center">
