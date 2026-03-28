@@ -345,9 +345,10 @@ const exGrammarMap = {
 
 function _buildPool() {
   let pool = [...sentences];
-  // When a unit is active, only show sentences for that unit
-  if (activeUnit) {
-    pool = pool.filter(s => s.unit === activeUnit.unit);
+  // When a unit is active or previewed, only show sentences for that unit
+  const unitFilter = activeUnit || _previewUnit;
+  if (unitFilter) {
+    pool = pool.filter(s => s.unit === unitFilter.unit);
   } else {
     if (exLevel !== 'all') pool = pool.filter(s => s.level === exLevel);
   }
@@ -3256,6 +3257,7 @@ function navigateToGrammarTopic(level, topicKey) {
 let activeUnit = null;
 let activeActivityIdx = 0; // current activity index within the unit
 let _activityPracticing = false; // true when practicing sentences for a grammar activity
+let _previewUnit = null; // unit object for filtering content without activating guided flow
 
 const ACTIVITY_PROGRESS_KEY = 'englishcoach_activity_progress';
 let activityProgress = {}; // { "1": [true, true, false, false, false], "2": [...] }
@@ -3288,6 +3290,7 @@ function _firstIncompleteActivity(unit) {
 }
 
 function setActiveUnit(unitNumber, skipNav) {
+  _previewUnit = null; // clear preview when activating a unit
   const all = _allUnits();
   activeUnit = all.find(u => u.unit === unitNumber) || null;
   if (activeUnit) {
@@ -3302,6 +3305,7 @@ function setActiveUnit(unitNumber, skipNav) {
 
 function clearActiveUnit() {
   activeUnit = null;
+  _previewUnit = null;
   activeActivityIdx = 0;
   vocabUnitTopics = null;
   vocabUnitLevel = null;
@@ -3309,6 +3313,53 @@ function clearActiveUnit() {
   _showAllContent();
   renderAllUnitBars();
   renderVocab();
+}
+
+function setPreviewUnit(unitNumber) {
+  if (!unitNumber || unitNumber === 'all') {
+    clearPreviewUnit();
+    return;
+  }
+  const all = _allUnits();
+  _previewUnit = all.find(u => u.unit === parseInt(unitNumber)) || null;
+  if (_previewUnit) {
+    const u = _previewUnit;
+    // Filter sentences by unit
+    rebuildActive();
+    exIdx = 0;
+    // Filter vocabulary by unit topics
+    if (u.vocabTopics && u.vocabTopics.length > 0) {
+      vocabUnitTopics = u.vocabTopics.map(vt => vt.topic);
+      vocabUnitLevel = u.level;
+    } else {
+      vocabUnitTopics = null;
+      vocabUnitLevel = null;
+    }
+    renderVocab();
+  }
+  renderAllUnitBars();
+  // Reload current panel content
+  const activePanel = document.querySelector('.panel.active');
+  if (activePanel) {
+    if (activePanel.id === 'panel-oefening') loadSentence();
+    if (activePanel.id === 'panel-woordenschat') renderVocab();
+    if (activePanel.id === 'panel-grammatica') renderGrammarContent();
+  }
+}
+
+function clearPreviewUnit() {
+  _previewUnit = null;
+  vocabUnitTopics = null;
+  vocabUnitLevel = null;
+  rebuildActive();
+  exIdx = 0;
+  renderAllUnitBars();
+  renderVocab();
+  const activePanel = document.querySelector('.panel.active');
+  if (activePanel) {
+    if (activePanel.id === 'panel-oefening') loadSentence();
+    if (activePanel.id === 'panel-grammatica') renderGrammarContent();
+  }
 }
 
 function markActivityDone(actIdx) {
@@ -3573,7 +3624,19 @@ function renderUnitBar(panelId) {
       </div>
     </div>`;
   } else {
-    container.innerHTML = '';
+    // Show unit selector dropdown for filtering (no active unit)
+    const unitOptions = all.map(u =>
+      `<option value="${u.unit}" ${_previewUnit && _previewUnit.unit === u.unit ? 'selected' : ''}>Unidad ${u.unit} · ${u.level} — ${u.title}</option>`
+    ).join('');
+
+    container.innerHTML = `<div class="unit-bar unit-bar--inactive">
+      <span class="unit-bar-label">Filtrar por unidad:</span>
+      <select class="unit-bar-select" onchange="setPreviewUnit(this.value)">
+        <option value="all" ${!_previewUnit ? 'selected' : ''}>Todas las unidades</option>
+        ${unitOptions}
+      </select>
+      ${_previewUnit ? `<button class="unit-bar-clear" onclick="clearPreviewUnit()" title="Quitar filtro">✕</button>` : ''}
+    </div>`;
   }
 }
 
